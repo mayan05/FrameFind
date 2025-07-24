@@ -1,0 +1,7 @@
+flask 
+sqlalchemy 
+mysql-connector-python 
+requests 
+scikit-learn 
+pandas
+python-dotenv
