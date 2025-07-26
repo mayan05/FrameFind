@@ -26,7 +26,3 @@ def get_recommendations(title, n=5):
         return movies["title"].iloc[[i[0] for i in sim_scores[1:n+1]]].tolist()
     except IndexError:
         return ["Movie not found"]
-
-
-print("Recommendations for 'The Matrix':")
-print(get_recommendations("Matrix"))

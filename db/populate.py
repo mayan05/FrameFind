@@ -20,16 +20,40 @@ print("\nCollecting the Genres and their ids...")
 
 # Fetching genres
 genre_url = f"{base_url}/genre/movie/list?api_key={api_key}"
-genre_response = requests.get(genre_url).json()
+genre_response_obj = requests.get(genre_url)
+
+if genre_response_obj.status_code != 200:
+    print(f"Error fetching genres. Status Code: {genre_response_obj.status_code}")
+    print(f"Response text: {genre_response_obj.text}")
+    raise ConnectionError("Failed to fetch genres from TMDB API. Check API key and network connectivity.")
+
+genre_response = genre_response_obj.json()
+
+if "genres" not in genre_response:
+    print("Error: 'genres' key not found in TMDB genre response.")
+    print(f"Full genre response: {genre_response}")
+    raise KeyError("'genres' key missing from TMDB genre response. Check API key and network connectivity.")
+
 genres_map = {genre["id"]: genre["name"] for genre in genre_response["genres"]}
 print(f"Genres fetched: {len(genres_map)} genres")
 
 print("\nCollecting data from TMDB...")
 
-for page in range(1,51): # Collecting 1000 popular movies
+for page in range(1,501): # Collecting 10000 popular movies
     url = f"{base_url}/movie/popular?api_key={api_key}&page={page}"
-    response = requests.get(url).json()
-    for movie in response["results"]:
+    response = requests.get(url)
+    if response.status_code != 200:
+        print(f"Error fetching popular movies page {page}. Status Code: {response.status_code}")
+        print(f"Response text: {response.text}")
+        raise ConnectionError(f"Failed to fetch popular movies from TMDB API for page {page}. Check API key and network connectivity.")
+
+    response_json = response.json()
+    if "results" not in response_json:
+        print(f"Error: 'results' key not found in TMDB popular movies response for page {page}.")
+        print(f"Full response: {response_json}")
+        raise KeyError(f"'results' key missing from TMDB popular movies response for page {page}. Check API key and network connectivity.")
+
+    for movie in response_json["results"]:
            movies.append({
                "movie_id": movie["id"],
                "title": movie["title"],
